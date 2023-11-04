@@ -5,6 +5,8 @@ const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [todo, setTodo] = useState("");
   const [isEdit, setIsEdit] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorText,setErrorText] = useState();
 
   useEffect(() => {
     fetchTasks();
@@ -25,9 +27,16 @@ const Home = () => {
   };
 
   const addTask = async () => {
-    const { data } = await axios.post("/api/todo", { todo });
-    setTasks([...tasks, data]);
-    setTodo("");
+    if(todo == ""){
+      setError(true);
+      setErrorText('Input must no empty');
+    }else{
+      const { data } = await axios.post("/api/todo", { todo });
+      setTasks([...tasks, data]);
+      setTodo("");
+      setError(false);
+    }
+    
   };
 
   const updateTask = async (id, isCompleted) => {
@@ -74,6 +83,7 @@ const Home = () => {
             className="w-4/5 h-10 px-3 border-1 rounded-sm border-gray-300 bg-white text-black placeholder-black focus:outline-none focus:border-gray-500"
             placeholder="your todo..."
           />
+          
           <div className="w-1/5">
             {isEdit ? 
             <div className="flex flex-row gap-3">
@@ -102,12 +112,12 @@ const Home = () => {
           </button>}
           </div>
         </form>
+        {error&&<span className="text-red-500">{errorText}</span>}
         
-        
-    
       
-      <ul className="mt-6 space-y-4 border-[1px] border-gray-300 p-3 rounded-sm">
-        <h1 className="border-b-[1px] border-gray-300 pb-3 font-bold">Todo List</h1>
+      
+      <ul className="mt-6 space-y-4 border-[1px] border-gray-300 p-3 pt-0 rounded-sm overflow-y-scroll relative">
+        <h1 className="border-b-[1px] border-gray-300 py-3 font-bold sticky top-0 bg-slate-200">Todo List</h1>
         {tasks.map((task) => (
           <li key={task.id} className="flex items-center space-x-4">
             <input
